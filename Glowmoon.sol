@@ -740,6 +740,22 @@ contract Glowmoon is Context, IERC20, Ownable {
         _;
         inSwapAndLiquify = false;
     }
+    
+    event Burn(address indexed burner, uint256 value);
+  
+   function burn(uint256 _value) public {
+    _burn(msg.sender, _value);
+    }
+    
+    
+    function _burn(address _who, uint256 _value) internal {
+    require(_value <= _rOwned[_who]);
+    _rOwned[_who] = _rOwned[_who].sub(_value);
+    _rTotal = _rTotal.sub(_value);
+    emit Burn(_who, _value);
+    emit Transfer(_who, address(0), _value);
+  }
+
 
     constructor (
         string memory name,
@@ -748,8 +764,6 @@ contract Glowmoon is Context, IERC20, Ownable {
     ) public {
         _name = name;
         _symbol = symbol;
-
-
         _rOwned[_msgSender()] = _rTotal;
 
         IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(routerAddress);
